@@ -45,18 +45,21 @@ The list of codes should be print out one per line in lexicographic order with n
 
 calls_dictionary = {}
 
+calls_log_list = []
 
-def calls_dict(incoming_calls, answering_calls):
-    """Define the method that take incoming calls and answering calls,
+
+def calls_log_append(incoming_calls, answering_calls):
+    """Define the method that take the logs of incoming calls and answering calls,
        and turn it into a dictionary
     """
     calls_dictionary[incoming_calls] = answering_calls
+    calls_log_list.append({calls_dictionary[incoming_calls]: answering_calls})
 
 
 for call in calls:
     # see if the incoming calls contains "080"
     if "080" in call[0]:
-        calls_dict(call[0], call[1])
+        calls_log_append(call[0], call[1])
 
 list_of_codes = []
 
@@ -67,7 +70,8 @@ for bangalore_call in calls_dictionary:
         """
         list_of_codes.append(calls_dictionary[bangalore_call][:calls_dictionary[bangalore_call].index(")") + 1])
     elif " " in calls_dictionary[bangalore_call] and (
-            calls_dictionary[bangalore_call].startswith("7") or calls_dictionary[bangalore_call].startswith("8") or
+                    calls_dictionary[bangalore_call].startswith("7") or calls_dictionary[bangalore_call].startswith(
+                    "8") or
                 calls_dictionary[bangalore_call].startswith("9")):
         # crop out the first four digits out of the number
         list_of_codes.append(calls_dictionary[bangalore_call][:4])
@@ -82,10 +86,9 @@ for bangalore_call in calls_dictionary:
 
 # Start wondering why there is no "140" in the output.
 # then I guess nobody would actually call Telemarkets' number spontaneously
-print("The numbers called by people in Bangalore have codes:{}")
+print("The numbers called by people in Bangalore have codes:")
 for code in list_of_codes:
     print(code)
-
 
 """
 Part B: What percentage of calls from fixed lines in Bangalore are made
@@ -99,13 +102,16 @@ to other fixed lines in Bangalore."
 The percentage should have 2 decimal digits
 """
 bangalore_receive = 0
-bangalore_calling = len(calls_dictionary)
+bangalore_calling = len(calls_log_list)
 
 
-for bangalore_call in calls_dictionary:
-    if "080" in calls_dictionary[bangalore_call]:
-        bangalore_receive += 1
+# the bizzare pattern: calls_log_list[{bangalore_call:x}]
+for bangalore_call in calls_log_list:
+    for x in bangalore_call:
+        if "080" in bangalore_call[x]:
+            bangalore_receive += 1
 # keep the 4 digits after the floating point
-percentage = round((bangalore_receive/bangalore_calling), 4)*100
+percentage = round((bangalore_receive / bangalore_calling), 4) * 100
 
-print("{} percent of calls from fixed lines in Bangalore are calls to other fixed lines in Bangalore.".format(percentage))
+print(
+    "\n{} percent of calls from fixed lines in Bangalore are calls to other fixed lines in Bangalore.".format(percentage))
